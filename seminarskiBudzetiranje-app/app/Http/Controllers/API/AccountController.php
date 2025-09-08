@@ -3,64 +3,51 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Models\Account;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class AccountController extends Controller
 {
-    /**
-     * Prikaz svih kategorija.
-     */
     public function index()
     {
-        return response()->json(Category::all());
+        // Vraća sve račune u JSON-u
+        return response()->json(Account::all());
     }
 
-    /**
-     * Kreiranje nove kategorije.
-     */
     public function store(Request $request)
     {
+        // Validacija ulaza
         $data = $request->validate([
             'user_id' => 'required|exists:users,id',
             'name'    => 'required|string|max:255',
-            'type'    => 'required|in:income,expense',
+            'balance' => 'nullable|numeric',
         ]);
 
-        $category = Category::create($data);
+        $account = Account::create($data);
 
-        return response()->json($category, 201);
+        return response()->json($account, 201);
     }
 
-    /**
-     * Prikaz jedne kategorije.
-     */
-    public function show(Category $category)
+    public function show(Account $account)
     {
-        return response()->json($category);
+        return response()->json($account);
     }
 
-    /**
-     * Ažuriranje postojeće kategorije.
-     */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, Account $account)
     {
         $data = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'type' => 'sometimes|required|in:income,expense',
+            'name'    => 'sometimes|required|string|max:255',
+            'balance' => 'sometimes|numeric',
         ]);
 
-        $category->update($data);
+        $account->update($data);
 
-        return response()->json($category);
+        return response()->json($account);
     }
 
-    /**
-     * Brisanje kategorije.
-     */
-    public function destroy(Category $category)
+    public function destroy(Account $account)
     {
-        $category->delete();
+        $account->delete();
         return response()->json(null, 204);
     }
 }

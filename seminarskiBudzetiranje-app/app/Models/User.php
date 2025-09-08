@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
 
 class User extends Authenticatable
 {
@@ -45,7 +46,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-public function accounts(): HasMany
+    public function accounts(): HasMany
     {
         return $this->hasMany(Account::class);
     }
@@ -56,7 +57,7 @@ public function accounts(): HasMany
     }
 
     // (opciono) direktan pristup transakcijama:
-    public function transactions(): HasMany
+    public function transactions(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->hasManyThrough(
             Transaction::class,
