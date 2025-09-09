@@ -8,8 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 
-class CategoryController extends Controller
+class CategoryController extends \Illuminate\Routing\Controller
 {
+    public function __construct()
+    {
+        // STORE / UPDATE / DESTROY zahtevaju autentifikaciju
+        $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
+    }
     public function index()
     {
         try {
@@ -22,6 +27,7 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
     public function store(Request $request)
     {
         try {
@@ -30,6 +36,7 @@ class CategoryController extends Controller
                 'name'    => 'required|string|max:255',
                 'type'    => 'required|in:income,expense',
             ]);
+
             $category = Category::create($data);
             return response()->json($category, 201);
         } catch (ValidationException $e) {
@@ -44,6 +51,7 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
     public function show(Category $category)
     {
         try {
@@ -55,6 +63,7 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
     public function update(Request $request, Category $category)
     {
         try {
@@ -77,6 +86,7 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
     public function destroy(Category $category)
     {
         try {

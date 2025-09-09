@@ -7,8 +7,13 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class TransactionController extends Controller
+class TransactionController extends \Illuminate\Routing\Controller
 {
+    public function __construct()
+    {
+        // STORE / UPDATE / DESTROY zahtevaju autentifikaciju
+        $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
+    }
     public function index()
     {
         try {
