@@ -23,16 +23,15 @@ class AuthController extends Controller
                 'name'                  => 'required|string|max:255',
                 'email'                 => 'required|email|unique:users,email',
                 'password'              => 'required|string|min:8|confirmed',
+                'role'                  => 'nullable|string|in:user,admin,guest', // Dozvoljene uloge
             ]);
-
             $user = User::create([
                 'name'     => $data['name'],
                 'email'    => $data['email'],
                 'password' => bcrypt($data['password']),
+                'role'     => $data['role'] ?? 'user', // Default ako nije prosleđeno
             ]);
-
             $token = $user->createToken('api-token')->plainTextToken;
-
             return response()->json([
                 'user'  => $user,
                 'token' => $token,
