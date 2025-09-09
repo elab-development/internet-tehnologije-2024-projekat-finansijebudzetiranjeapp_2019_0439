@@ -15,10 +15,21 @@ class CategoryController extends \Illuminate\Routing\Controller
         // STORE / UPDATE / DESTROY zahtevaju autentifikaciju
         $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
     }
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $categories = Category::all();
+            $perPage = $request->query('per_page', 15);
+            $page    = $request->query('page', 1);
+
+            $query = Category::query();
+
+            // Filter by type (income|expense)
+            if ($request->has('type')) {
+                $query->where('type', $request->query('type'));
+            }
+
+            $categories = $query->paginate($perPage, ['*'], 'page', $page);
+
             return response()->json($categories);
         } catch (\Throwable $e) {
             return response()->json([

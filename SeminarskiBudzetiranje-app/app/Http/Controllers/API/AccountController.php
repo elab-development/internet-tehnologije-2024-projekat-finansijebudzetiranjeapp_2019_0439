@@ -14,10 +14,22 @@ class AccountController extends \Illuminate\Routing\Controller
         // STORE / UPDATE / DESTROY zahtevaju autentifikaciju
         $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
     }
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $accounts = Account::all();
+            // Pagination params
+            $perPage = $request->query('per_page', 15);    // default 15
+            $page    = $request->query('page', 1);
+
+            // Optional filtering by user_id
+            $query = Account::query();
+            if ($request->has('user_id')) {
+                $query->where('user_id', $request->query('user_id'));
+            }
+
+            // Execute paginated query
+            $accounts = $query->paginate($perPage, ['*'], 'page', $page);
+
             return response()->json($accounts);
         } catch (\Throwable $e) {
             return response()->json([
