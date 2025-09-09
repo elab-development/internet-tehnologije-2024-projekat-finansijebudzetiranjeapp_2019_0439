@@ -21,6 +21,7 @@ class TransactionController extends Controller
             ], 500);
         }
     }
+
     public function store(Request $request)
     {
         try {
@@ -30,6 +31,7 @@ class TransactionController extends Controller
                 'amount'          => 'required|numeric',
                 'transaction_date' => 'required|date',
             ]);
+
             $transaction = Transaction::create($data);
             return response()->json($transaction, 201);
         } catch (ValidationException $e) {
@@ -44,6 +46,7 @@ class TransactionController extends Controller
             ], 500);
         }
     }
+
     public function show(Transaction $transaction)
     {
         try {
@@ -55,6 +58,7 @@ class TransactionController extends Controller
             ], 500);
         }
     }
+
     public function update(Request $request, Transaction $transaction)
     {
         try {
@@ -77,6 +81,7 @@ class TransactionController extends Controller
             ], 500);
         }
     }
+
     public function destroy(Transaction $transaction)
     {
         try {
@@ -85,6 +90,27 @@ class TransactionController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to delete transaction',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function search(Request $request)
+    {
+        try {
+            $q = $request->input('q');
+
+            if (! is_numeric($q)) {
+                return response()->json([
+                    'message' => 'Query must be a number (amount).'
+                ], 422);
+            }
+
+            $results = Transaction::where('amount', '>=', $q)->get();
+
+            return response()->json($results);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to search transactions',
                 'error'   => $e->getMessage(),
             ], 500);
         }
