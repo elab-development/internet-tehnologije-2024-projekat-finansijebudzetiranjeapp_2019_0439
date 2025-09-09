@@ -5,63 +5,88 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
 
 class CategoryController extends Controller
 {
-    /**
-     * Prikaz svih kategorija.
-     */
     public function index()
     {
-        return response()->json(Category::all());
+        try {
+            $categories = Category::all();
+            return response()->json($categories);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to fetch categories',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
-
-    /**
-     * Kreiranje nove kategorije.
-     */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'name'    => 'required|string|max:255',
-            'type'    => 'required|in:income,expense',
-        ]);
-
-        $category = Category::create($data);
-
-        return response()->json($category, 201);
+        try {
+            $data = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'name'    => 'required|string|max:255',
+                'type'    => 'required|in:income,expense',
+            ]);
+            $category = Category::create($data);
+            return response()->json($category, 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to create category',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
-
-    /**
-     * Prikaz jedne kategorije.
-     */
     public function show(Category $category)
     {
-        return response()->json($category);
+        try {
+            return response()->json($category);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to fetch category',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
-
-    /**
-     * Ažuriranje postojeće kategorije.
-     */
     public function update(Request $request, Category $category)
     {
-        $data = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'type' => 'sometimes|required|in:income,expense',
-        ]);
+        try {
+            $data = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'type' => 'sometimes|required|in:income,expense',
+            ]);
 
-        $category->update($data);
-
-        return response()->json($category);
+            $category->update($data);
+            return response()->json($category);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to update category',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
-
-    /**
-     * Brisanje kategorije.
-     */
     public function destroy(Category $category)
     {
-        $category->delete();
-        return response()->json(null, 204);
+        try {
+            $category->delete();
+            return response()->json(null, 204);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to delete category',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
 }
-

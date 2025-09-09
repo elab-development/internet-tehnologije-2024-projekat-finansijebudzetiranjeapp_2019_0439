@@ -5,66 +5,88 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class TransactionController extends Controller
 {
-    /**
-     * Prikaz svih transakcija.
-     */
     public function index()
     {
-        return response()->json(Transaction::all());
+        try {
+            $transactions = Transaction::all();
+            return response()->json($transactions);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to fetch transactions',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
-
-    /**
-     * Kreiranje nove transakcije.
-     */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'account_id'      => 'required|exists:accounts,id',
-            'category_id'     => 'required|exists:categories,id',
-            'amount'          => 'required|numeric',
-            'transaction_date'=> 'required|date',
-            //'description'     => 'nullable|string',
-        ]);
-
-        $transaction = Transaction::create($data);
-
-        return response()->json($transaction, 201);
+        try {
+            $data = $request->validate([
+                'account_id'      => 'required|exists:accounts,id',
+                'category_id'     => 'required|exists:categories,id',
+                'amount'          => 'required|numeric',
+                'transaction_date' => 'required|date',
+            ]);
+            $transaction = Transaction::create($data);
+            return response()->json($transaction, 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to create transaction',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
-
-    /**
-     * Prikaz jedne transakcije.
-     */
     public function show(Transaction $transaction)
     {
-        return response()->json($transaction);
+        try {
+            return response()->json($transaction);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to fetch transaction',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
-
-    /**
-     * Ažuriranje postojeće transakcije.
-     */
     public function update(Request $request, Transaction $transaction)
     {
-        $data = $request->validate([
-            'amount'          => 'sometimes|required|numeric',
-            'transaction_date'=> 'sometimes|required|date',
-            //'description'     => 'nullable|string',
-        ]);
+        try {
+            $data = $request->validate([
+                'amount'          => 'sometimes|required|numeric',
+                'transaction_date' => 'sometimes|required|date',
+            ]);
 
-        $transaction->update($data);
-
-        return response()->json($transaction);
+            $transaction->update($data);
+            return response()->json($transaction);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to update transaction',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
-
-    /**
-     * Brisanje transakcije.
-     */
     public function destroy(Transaction $transaction)
     {
-        $transaction->delete();
-        return response()->json(null, 204);
+        try {
+            $transaction->delete();
+            return response()->json(null, 204);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to delete transaction',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
 }
-
