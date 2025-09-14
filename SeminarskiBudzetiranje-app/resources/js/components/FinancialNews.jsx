@@ -25,8 +25,27 @@ const FinancialNews = ({ compact = false }) => {
         try {
             // Koristimo NewsAPI.org (potreban je API key, ali možemo koristiti mock podatke)
             // const response = await axios.get(`https://newsapi.org/v2/top-headlines?category=${selectedCategory}&country=us&apiKey=YOUR_API_KEY`);
-            
+
             // Mock podaci za demo (u produkciji koristiti pravi API)
+            // NOVI URL sa tvojim API ključem
+        const response = await axios.get(`https://newsapi.org/v2/top-headlines?category=${selectedCategory}&country=us&pageSize=10&apiKey=44b80aee5f8c447d9f24222410ad246b`);
+        
+        if (response.data && response.data.articles) {
+            // Filtruj artikle koji imaju sve potrebne podatke
+            const validArticles = response.data.articles.filter(article => 
+                article.title && 
+                article.description && 
+                article.urlToImage && 
+                article.source.name
+            );
+            
+            setNews(validArticles);
+        } else {
+            throw new Error('Invalid API response');
+        }
+        } catch (err) {
+            console.error('Error fetching news:', err);
+            setError('Failed to fetch financial news. Please try again later.');
             const mockNews = [
                 {
                     id: 1,
@@ -97,10 +116,7 @@ const FinancialNews = ({ compact = false }) => {
             ];
 
             setNews(mockNews);
-        } catch (err) {
-            console.error('Error fetching news:', err);
-            setError('Failed to fetch financial news. Please try again later.');
-        } finally {
+} finally {
             setLoading(false);
         }
     };
@@ -109,7 +125,7 @@ const FinancialNews = ({ compact = false }) => {
         const now = new Date();
         const publishedDate = new Date(dateString);
         const diffInHours = Math.floor((now - publishedDate) / (1000 * 60 * 60));
-        
+
         if (diffInHours < 1) return 'Just now';
         if (diffInHours < 24) return `${diffInHours}h ago`;
         const diffInDays = Math.floor(diffInHours / 24);
@@ -151,7 +167,7 @@ const FinancialNews = ({ compact = false }) => {
                 <h4 style={{ margin: '0 0 15px 0', color: '#2d3e50', fontSize: '16px' }}>
                     📰 Financial News
                 </h4>
-                
+
                 {loading ? (
                     <p style={{ color: '#666', fontSize: '14px' }}>Loading news...</p>
                 ) : error ? (
@@ -196,7 +212,7 @@ const FinancialNews = ({ compact = false }) => {
                                 </div>
                             </div>
                         ))}
-                        
+
                         <div style={{ textAlign: 'center', marginTop: '10px' }}>
                             <button
                                 onClick={fetchNews}
@@ -326,7 +342,7 @@ const FinancialNews = ({ compact = false }) => {
                                             e.target.src = 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=180&fit=crop';
                                         }}
                                     />
-                                    
+
                                     {/* Relevance Badge */}
                                     <div style={{
                                         position: 'absolute',
@@ -341,7 +357,7 @@ const FinancialNews = ({ compact = false }) => {
                                     }}>
                                         {relevanceBadge.text}
                                     </div>
-                                    
+
                                     {/* Category Icon */}
                                     <div style={{
                                         position: 'absolute',
@@ -467,5 +483,3 @@ const FinancialNews = ({ compact = false }) => {
         </div>
     );
 };
-
-export default FinancialNews;

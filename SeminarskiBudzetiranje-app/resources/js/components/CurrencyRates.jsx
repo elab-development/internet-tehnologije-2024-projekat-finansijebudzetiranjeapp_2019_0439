@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import CustomButton from './CustomButton';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const CurrencyRates = ({ showInSidebar = false }) => {
     const [rates, setRates] = useState({});
-    const [baseCurrency, setBaseCurrency] = useState('USD');
+const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [lastUpdated, setLastUpdated] = useState('');
-    const [selectedCurrencies, setSelectedCurrencies] = useState(['EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'RSD']);
+    const [lastUpdated, setLastUpdated] = useState('');const [selectedCurrencies, setSelectedCurrencies] = useLocalStorage('selectedCurrencies', ['EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'RSD']);
 
     // Popularne valute sa flagama
     const currencyInfo = {
@@ -47,24 +47,26 @@ const CurrencyRates = ({ showInSidebar = false }) => {
 
         try {
             // Koristimo besplatni ExchangeRate-API
-            const response = await axios.get(`https://api.exchangerate-api.com/v4/latest/${baseCurrency}`);
-            
-            if (response.data && response.data.rates) {
-                setRates(response.data.rates);
-                setLastUpdated(new Date(response.data.date).toLocaleDateString('sr-RS', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }));
-            } else {
-                throw new Error('Invalid API response');
-            }
+// NOVI URL sa tvojim API ključem
+        const response = await axios.get(`https://v6.exchangerate-api.com/v6/20bdf3d396a0861926ffa2a3/latest/${baseCurrency}`);
+        
+        if (response.data && response.data.conversion_rates) {
+            // Promena: conversion_rates umesto rates
+            setRates(response.data.conversion_rates);
+            setLastUpdated(new Date(response.data.time_last_update_utc).toLocaleDateString('sr-RS', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }));
+        } else {
+            throw new Error('Invalid API response');
+        }
         } catch (err) {
             console.error('Error fetching exchange rates:', err);
             setError('Failed to fetch exchange rates. Please try again later.');
-            
+
             // Fallback - mock podaci za demo
             setRates({
                 'EUR': 0.85,
@@ -110,7 +112,7 @@ const CurrencyRates = ({ showInSidebar = false }) => {
                 <h4 style={{ margin: '0 0 15px 0', color: '#2d3e50', fontSize: '16px' }}>
                     💱 Exchange Rates
                 </h4>
-                
+
                 {loading ? (
                     <p style={{ color: '#666', fontSize: '14px' }}>Loading rates...</p>
                 ) : error ? (
@@ -120,7 +122,7 @@ const CurrencyRates = ({ showInSidebar = false }) => {
                         <div style={{ marginBottom: '10px', fontSize: '12px', color: '#666' }}>
                             Base: <strong>{baseCurrency}</strong>
                         </div>
-                        
+
                         {selectedCurrencies.slice(0, 5).map(currency => {
                             if (!rates[currency] || currency === baseCurrency) return null;
                             const trend = getChangeIndicator(rates[currency]);
@@ -145,7 +147,7 @@ const CurrencyRates = ({ showInSidebar = false }) => {
                                 </div>
                             );
                         })}
-                        
+
                         <div style={{ fontSize: '10px', color: '#999', marginTop: '10px' }}>
                             Updated: {lastUpdated}
                         </div>
@@ -231,7 +233,7 @@ const CurrencyRates = ({ showInSidebar = false }) => {
                             if (!rates[currency] || currency === baseCurrency) return null;
                             const trend = getChangeIndicator(rates[currency]);
                             const info = currencyInfo[currency];
-                            
+
                             return (
                                 <div key={currency} style={{
                                     backgroundColor: '#f8f9fa',
@@ -268,7 +270,7 @@ const CurrencyRates = ({ showInSidebar = false }) => {
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div style={{ fontSize: '12px', color: '#666' }}>
                                         1 {baseCurrency} = {rates[currency].toFixed(4)} {currency}
                                     </div>
@@ -331,10 +333,10 @@ const CurrencyRates = ({ showInSidebar = false }) => {
                                     const amount = parseFloat(document.getElementById('convertAmount').value) || 100;
                                     const from = document.getElementById('fromCurrency').value;
                                     const to = document.getElementById('toCurrency').value;
-                                    
+
                                     const fromRate = from === baseCurrency ? 1 : rates[from];
                                     const toRate = to === baseCurrency ? 1 : rates[to];
-                                    
+
                                     const result = calculateConversion(amount, fromRate, toRate);
                                     alert(`${amount} ${from} = ${result} ${to}`);
                                 }}
@@ -360,5 +362,3 @@ const CurrencyRates = ({ showInSidebar = false }) => {
         </div>
     );
 };
-
-export default CurrencyRates;
