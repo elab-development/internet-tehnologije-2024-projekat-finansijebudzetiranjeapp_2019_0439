@@ -33,9 +33,12 @@ class AccountController extends \Illuminate\Routing\Controller
                 // Admin može da filtrira po određenom korisniku
                 $query->where('user_id', $request->query('user_id'));
             }
+
             // Execute paginated query
             $accounts = $query->paginate($perPage, ['*'], 'page', $page);
+
             return response()->json($accounts);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to fetch accounts',
@@ -43,6 +46,7 @@ class AccountController extends \Illuminate\Routing\Controller
             ], 500);
         }
     }
+
     public function store(Request $request)
     {
         try {
@@ -64,11 +68,13 @@ class AccountController extends \Illuminate\Routing\Controller
 
             $account = Account::create($data);
             return response()->json($account, 201);
+
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors'  => $e->errors(),
             ], 422);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to create account',
@@ -76,6 +82,7 @@ class AccountController extends \Illuminate\Routing\Controller
             ], 500);
         }
     }
+
     public function show(Request $request, Account $account)
     {
         try {
@@ -83,10 +90,10 @@ class AccountController extends \Illuminate\Routing\Controller
 
             // Proverava da li korisnik ima dozvolu da vidi ovaj račun
             if ($user && $user->role !== 'admin' && $account->user_id !== $user->id) {
-                return response()->json([
-                    'message' => 'Unauthorized to view this account'
-                ], 403);
-            }
+return response()->json([
+        'message' => 'Unauthorized to view this account'
+    ], 403);
+}
 
             return response()->json($account);
         } catch (\Throwable $e) {
@@ -116,11 +123,13 @@ class AccountController extends \Illuminate\Routing\Controller
 
             $account->update($data);
             return response()->json($account);
+
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors'  => $e->errors(),
             ], 422);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to update account',
@@ -128,6 +137,7 @@ class AccountController extends \Illuminate\Routing\Controller
             ], 500);
         }
     }
+
     public function destroy(Request $request, Account $account)
     {
         try {
@@ -142,6 +152,7 @@ class AccountController extends \Illuminate\Routing\Controller
 
             $account->delete();
             return response()->json(null, 204);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to delete account',
@@ -173,5 +184,4 @@ class AccountController extends \Illuminate\Routing\Controller
                 'error'   => $e->getMessage(),
             ], 500);
         }
-    }
-}
+    }}
