@@ -19,4 +19,4 @@ const CustomButton = ({ label, onClick, type = "button", styleType = "primary" }
     );
 };
 
-export default CustomButton;import React from 'react';
+export default CustomButton;

@@ -19,4 +19,3 @@ const Card = ({ title, description, image, onAction }) => {
 };
 
 export default Card;
-

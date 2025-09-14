@@ -1,16 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Stranice
-import '../css/app.css';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Transactions from './pages/Transactions';
-
+import "../css/app.css";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Transactions from "./pages/Transactions";
+import NotFound from "./pages/NotFound";
 // Komponente
-import Navbar from './components/Navbar';
-
+import Navbar from "./components/Navbar";
 function App() {
     return (
         <Router>
@@ -19,9 +18,9 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/transactions" element={<Transactions />} />
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </Router>
     );
 }
-
-ReactDOM.createRoot(document.getElementById('app')).render(<App />);
+ReactDOM.createRoot(document.getElementById("app")).render(<App />);
