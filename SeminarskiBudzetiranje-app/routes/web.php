@@ -9,36 +9,36 @@ use App\Http\Controllers\API\UploadController;
 
 Route::prefix('api')->group(function () {
 
-     Route::post('register', [AuthController::class, 'register'])
-          ->name('api.register');
-     Route::post('login',    [AuthController::class, 'login'])
-          ->name('api.login');
-     Route::post('logout',   [AuthController::class, 'logout'])
-          ->middleware('auth:sanctum')
-          ->name('api.logout');
+    Route::post('register', [AuthController::class, 'register'])
+        ->name('api.register');
+    Route::post('login', [AuthController::class, 'login'])
+        ->name('api.login');
+    Route::post('logout', [AuthController::class, 'logout'])
+        ->middleware('auth:sanctum')
+        ->name('api.logout');
 
-     Route::post('password/forgot', [AuthController::class, 'forgotPassword'])
-          ->name('password.forgot');
-     Route::post('password/reset',  [AuthController::class, 'resetPassword'])
-          ->name('password.reset');
-     // 1) Resource rute
-     Route::apiResource('accounts',    AccountController::class);
-     Route::apiResource('categories',  CategoryController::class);
+    Route::post('password/forgot', [AuthController::class, 'forgotPassword'])
+        ->name('password.forgot');
+    Route::post('password/reset', [AuthController::class, 'resetPassword'])
+        ->name('password.reset');
 
+    // 1) Resource rute
+    Route::apiResource('accounts', AccountController::class);
+    Route::apiResource('categories', CategoryController::class);
 
-     // 2) Ruta sa više HTTP metoda za pretragu transakcija
-     Route::match(['get', 'post'], 'transactions/search', [TransactionController::class, 'search'])
-          ->name('transactions.search');
+    // 2) Ruta sa više HTTP metoda za pretragu transakcija
+    Route::match(['get', 'post'], 'transactions/search', [TransactionController::class, 'search'])
+        ->name('transactions.search');
 
-     Route::apiResource('transactions', TransactionController::class);
+    Route::apiResource('transactions', TransactionController::class);
 
-     // 3) Dinamička i imenovana ruta za transakcije jednog računa
-     Route::get('accounts/{account}/transactions', [AccountController::class, 'transactions'])
-          ->name('accounts.transactions');
+    // 3) Dinamička i imenovana ruta za transakcije jednog računa
+    Route::get('accounts/{account}/transactions', [AccountController::class, 'transactions'])
+        ->name('accounts.transactions');
 
-     Route::post('upload', [UploadController::class, 'storeSimple']);
+    Route::post('upload', [UploadController::class, 'storeSimple']);
 
-     Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
         Route::get('admin/dashboard', function () {
             return response()->json(['message' => 'Welcome Admin']);
         });
@@ -55,8 +55,13 @@ Route::prefix('api')->group(function () {
         return response()->json(['message' => 'Hello Guest']);
     });
 
-     // 4) Fallback ruta za sve neuhvaćene /api URI-je
-     Route::fallback(function () {
-          return response()->json(['message' => 'Not Found'], 404);
-     });
+    // 4) Fallback ruta za sve neuhvaćene /api URI-je
+    Route::fallback(function () {
+        return response()->json(['message' => 'Not Found'], 404);
+    });
 });
+
+// SPA fallback ruta za React
+Route::get('/{any}', function () {
+    return view('welcome');
+})->where('any', '.*');
