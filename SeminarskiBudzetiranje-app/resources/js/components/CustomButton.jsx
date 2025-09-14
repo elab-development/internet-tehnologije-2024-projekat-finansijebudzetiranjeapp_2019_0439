@@ -14,5 +14,5 @@ const CustomButton = ({ label, onClick, type = "button", styleType = "primary" }
         </button>
     );
 };
-
+//
 export default CustomButton;
