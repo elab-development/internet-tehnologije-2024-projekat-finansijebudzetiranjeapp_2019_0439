@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -11,29 +12,30 @@ class TransactionController extends \Illuminate\Routing\Controller
 {
     public function __construct()
     {
-        // STORE / UPDATE / DESTROY zahtevaju autentifikaciju
         $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
     }
+
     public function index(Request $request)
     {
         try {
-            $perPage = $request->query('per_page', 15);
+            $perPage = $request->query('per_page', 5); // default 5
             $page    = $request->query('page', 1);
-
-            $query = Transaction::query();
-
-            // Filtering examples:
+            $query = Transaction::query()
+                ->with('category') // eager load kategorije
+                ->join('categories', 'transactions.category_id', '=', 'categories.id')
+                ->select('transactions.*', 'categories.type as category_type');
+            // Filtriranje po minimalnom iznosu
             if ($request->has('min_amount')) {
                 $query->where('amount', '>=', $request->query('min_amount'));
             }
+
+            // Filtriranje po maksimalnom iznosu
             if ($request->has('max_amount')) {
                 $query->where('amount', '<=', $request->query('max_amount'));
             }
-            if ($request->has('date_from')) {
-                $query->where('transaction_date', '>=', $request->query('date_from'));
-            }
-            if ($request->has('date_to')) {
-                $query->where('transaction_date', '<=', $request->query('date_to'));
+            // Filtriranje po tipu kategorije (income / expense)
+            if ($request->has('category_type')) {
+                $query->where('categories.type', $request->query('category_type'));
             }
 
             $transactions = $query->paginate($perPage, ['*'], 'page', $page);
@@ -56,6 +58,10 @@ class TransactionController extends \Illuminate\Routing\Controller
                 'amount'          => 'required|numeric',
                 'transaction_date' => 'required|date',
             ]);
+
+            // Automatski postavi type na osnovu kategorije
+            $category = Category::find($data['category_id']);
+            $data['type'] = $category->type;
 
             $transaction = Transaction::create($data);
             return response()->json($transaction, 201);
@@ -90,6 +96,7 @@ class TransactionController extends \Illuminate\Routing\Controller
             $data = $request->validate([
                 'amount'          => 'sometimes|required|numeric',
                 'transaction_date' => 'sometimes|required|date',
+                'type'            => 'sometimes|in:income,expense'
             ]);
 
             $transaction->update($data);
@@ -119,19 +126,17 @@ class TransactionController extends \Illuminate\Routing\Controller
             ], 500);
         }
     }
+
     public function search(Request $request)
     {
         try {
             $q = $request->input('q');
-
-            if (! is_numeric($q)) {
+            if (!is_numeric($q)) {
                 return response()->json([
                     'message' => 'Query must be a number (amount).'
                 ], 422);
             }
-
             $results = Transaction::where('amount', '>=', $q)->get();
-
             return response()->json($results);
         } catch (\Throwable $e) {
             return response()->json([

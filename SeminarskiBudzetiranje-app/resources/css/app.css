@@ -2,7 +2,7 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f6f8;
     color: #333;
 }
@@ -25,9 +25,7 @@ nav a:hover {
 }
 
 /* Naslovi */
-h1,
-h2,
-h3 {
+h1, h2, h3 {
     color: #2d3e50;
 }
 
@@ -54,6 +52,7 @@ h3 {
     background-color: #607d8b;
     color: white;
 }
+
 .btn-secondary:hover {
     background-color: #546e7a;
 }
@@ -82,7 +81,7 @@ input[type="password"] {
 .card {
     background-color: white;
     border-radius: 8px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
     padding: 15px;
     margin-top: 20px;
     max-width: 300px;
@@ -104,4 +103,54 @@ input[type="password"] {
 /* Glavni sadržaj */
 .container {
     padding: 20px;
+}
+.transactions-container {
+    padding: 20px;
+}
+
+.filters {
+    margin-bottom: 15px;
+}
+
+.filters input,
+.filters select {
+    margin-right: 10px;
+    padding: 5px;
+}
+
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.transactions-table th {
+    background-color: #f2f2f2;
+}
+
+.pagination {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.pagination button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
 }
