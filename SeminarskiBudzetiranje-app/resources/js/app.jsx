@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";
 import ManageUsers from "./pages/ManageUsers";
 import ResetPassword from "./pages/ResetPassword";
+import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 
 // Components
 import Navbar from "./components/Navbar";
@@ -29,6 +30,7 @@ function App() {
                 {/* Public routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
+
                 {/* Protected routes - require authentication */}
                 <Route
                     path="/transactions"
@@ -48,6 +50,15 @@ function App() {
                     }
                 />
 
+                {/* NOVA ANALYTICS RUTA - dostupna svim autentifikovanim korisnicima */}
+                <Route
+                    path="/analytics"
+                    element={
+                        <ProtectedRoute>
+                            <AnalyticsDashboard />
+                        </ProtectedRoute>
+                    }
+                />
                 {/* Admin-only routes */}
                 <Route
                     path="/admin/dashboard"
@@ -57,6 +68,7 @@ function App() {
                         </RoleBasedRoute>
                     }
                 />
+
                 <Route
                     path="/admin/users"
                     element={
@@ -72,4 +84,5 @@ function App() {
         </Router>
     );
 }
+
 ReactDOM.createRoot(document.getElementById("app")).render(<App />);
