@@ -11,6 +11,7 @@ const Breadcrumbs = () => {
         '/': { label: 'Home', icon: '🏠' },
         '/login': { label: 'Login', icon: '🔐' },
         '/transactions': { label: 'Transactions', icon: '💰' },
+        '/market-data': { label: 'Market Data', icon: '📈' },
         '/admin': { label: 'Admin', icon: '👑' },
         '/admin/dashboard': { label: 'Dashboard', icon: '📊' },
         '/admin/users': { label: 'Manage Users', icon: '👥' },
@@ -32,11 +33,11 @@ const Breadcrumbs = () => {
         // Ako nismo na home stranici, dodaj ostale segmente
         if (location.pathname !== '/') {
             let currentPath = '';
-            
+
             pathnames.forEach((segment, index) => {
                 currentPath += `/${segment}`;
                 const isLast = index === pathnames.length - 1;
-                
+
                 // Specijalni slučajevi za admin rute
                 if (segment === 'admin' && pathnames.length === 1) {
                     // Samo /admin - redirect na dashboard
@@ -120,7 +121,7 @@ const Breadcrumbs = () => {
                                 ›
                             </span>
                         )}
-                        
+
                         {crumb.current ? (
                             <span style={{
                                 color: '#495057',
@@ -164,7 +165,7 @@ const Breadcrumbs = () => {
                     </li>
                 ))}
             </ol>
-            
+
             {/* Dodatne informacije za admin */}
             {isAdmin && (location.pathname.includes('/admin') || location.pathname.includes('/transactions')) && (
                 <div style={{ 
@@ -183,5 +184,3 @@ const Breadcrumbs = () => {
         </nav>
     );
 };
-
-export default Breadcrumbs;
