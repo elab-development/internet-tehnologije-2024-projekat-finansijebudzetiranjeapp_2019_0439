@@ -20,11 +20,11 @@ class FinancialSeeder extends Seeder
 
         // 2) Kreiraj 5 kategorija
         $user->categories()->createMany([
-            ['name' => 'Groceries',     'type' => 'expense'],
-            ['name' => 'Utilities',     'type' => 'expense'],
-            ['name' => 'Entertainment', 'type' => 'expense'],
-            ['name' => 'Salary',        'type' => 'income'],
-            ['name' => 'Investment',    'type' => 'income'],
+          ['name'=>'Groceries',     'type'=>'expense'],
+          ['name'=>'Utilities',     'type'=>'expense'],
+          ['name'=>'Entertainment', 'type'=>'expense'],
+          ['name'=>'Salary',        'type'=>'income'],
+          ['name'=>'Investment',    'type'=>'income'],
         ]);
 
         // 3) Za korisnika kreiraj 3 računa i po 20 transakcija
@@ -39,7 +39,7 @@ class FinancialSeeder extends Seeder
                 $account->transactions()->create([
                     'category_id'     => $cat->id,
                     'amount'          => rand(10, 500),
-                    'transaction_date' => now()->subDays(rand(0, 30))->toDateString(),
+                    'transaction_date'=> now()->subDays(rand(0, 30))->toDateString(),
                 ]);
             }
         }

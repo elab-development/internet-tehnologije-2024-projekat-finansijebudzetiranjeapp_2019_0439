@@ -5,10 +5,11 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const CurrencyRates = ({ showInSidebar = false }) => {
     const [rates, setRates] = useState({});
-const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
+    const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [lastUpdated, setLastUpdated] = useState('');const [selectedCurrencies, setSelectedCurrencies] = useLocalStorage('selectedCurrencies', ['EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'RSD']);
+    const [lastUpdated, setLastUpdated] = useState('');
+    const [selectedCurrencies, setSelectedCurrencies] = useLocalStorage('selectedCurrencies', ['EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'RSD']);
 
     // Popularne valute sa flagama
     const currencyInfo = {
@@ -47,7 +48,7 @@ const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
 
         try {
             // Koristimo besplatni ExchangeRate-API
-// NOVI URL sa tvojim API ključem
+            // NOVI URL sa tvojim API ključem
         const response = await axios.get(`https://v6.exchangerate-api.com/v6/20bdf3d396a0861926ffa2a3/latest/${baseCurrency}`);
         
         if (response.data && response.data.conversion_rates) {
@@ -66,7 +67,7 @@ const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
         } catch (err) {
             console.error('Error fetching exchange rates:', err);
             setError('Failed to fetch exchange rates. Please try again later.');
-
+            
             // Fallback - mock podaci za demo
             setRates({
                 'EUR': 0.85,
@@ -112,7 +113,7 @@ const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
                 <h4 style={{ margin: '0 0 15px 0', color: '#2d3e50', fontSize: '16px' }}>
                     💱 Exchange Rates
                 </h4>
-
+                
                 {loading ? (
                     <p style={{ color: '#666', fontSize: '14px' }}>Loading rates...</p>
                 ) : error ? (
@@ -122,7 +123,7 @@ const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
                         <div style={{ marginBottom: '10px', fontSize: '12px', color: '#666' }}>
                             Base: <strong>{baseCurrency}</strong>
                         </div>
-
+                        
                         {selectedCurrencies.slice(0, 5).map(currency => {
                             if (!rates[currency] || currency === baseCurrency) return null;
                             const trend = getChangeIndicator(rates[currency]);
@@ -147,7 +148,7 @@ const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
                                 </div>
                             );
                         })}
-
+                        
                         <div style={{ fontSize: '10px', color: '#999', marginTop: '10px' }}>
                             Updated: {lastUpdated}
                         </div>
@@ -233,7 +234,7 @@ const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
                             if (!rates[currency] || currency === baseCurrency) return null;
                             const trend = getChangeIndicator(rates[currency]);
                             const info = currencyInfo[currency];
-
+                            
                             return (
                                 <div key={currency} style={{
                                     backgroundColor: '#f8f9fa',
@@ -270,7 +271,7 @@ const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
                                             </div>
                                         </div>
                                     </div>
-
+                                    
                                     <div style={{ fontSize: '12px', color: '#666' }}>
                                         1 {baseCurrency} = {rates[currency].toFixed(4)} {currency}
                                     </div>
@@ -333,10 +334,10 @@ const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
                                     const amount = parseFloat(document.getElementById('convertAmount').value) || 100;
                                     const from = document.getElementById('fromCurrency').value;
                                     const to = document.getElementById('toCurrency').value;
-
+                                    
                                     const fromRate = from === baseCurrency ? 1 : rates[from];
                                     const toRate = to === baseCurrency ? 1 : rates[to];
-
+                                    
                                     const result = calculateConversion(amount, fromRate, toRate);
                                     alert(`${amount} ${from} = ${result} ${to}`);
                                 }}
@@ -362,3 +363,5 @@ const [baseCurrency, setBaseCurrency] = useLocalStorage('baseCurrency', 'USD');
         </div>
     );
 };
+
+export default CurrencyRates;

@@ -15,6 +15,7 @@ class TransactionController extends \Illuminate\Routing\Controller
         // STORE / UPDATE / DESTROY zahtevaju autentifikaciju
         $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
     }
+    
     public function index(Request $request)
     {
         try {
@@ -24,7 +25,7 @@ class TransactionController extends \Illuminate\Routing\Controller
             $query = Transaction::query()->with(['account', 'category']);
 
             $user = $request->user();
-
+            
             // Ako nije admin, vidi samo svoje transakcije
             if ($user && $user->role !== 'admin') {
                 $query->whereHas('account', function ($q) use ($user) {
@@ -36,6 +37,7 @@ class TransactionController extends \Illuminate\Routing\Controller
                 $accountIds = explode(',', $request->query('account_ids'));
                 $query->whereIn('account_id', $accountIds);
             }
+
             // Filtering examples:
             if ($request->has('min_amount')) {
                 $query->where('amount', '>=', $request->query('min_amount'));
@@ -55,10 +57,14 @@ class TransactionController extends \Illuminate\Routing\Controller
             if ($request->has('category_id')) {
                 $query->where('category_id', $request->query('category_id'));
             }
+
             // Order by newest first
             $query->orderBy('transaction_date', 'desc')->orderBy('created_at', 'desc');
+
             $transactions = $query->paginate($perPage, ['*'], 'page', $page);
+
             return response()->json($transactions);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to fetch transactions',
@@ -66,17 +72,19 @@ class TransactionController extends \Illuminate\Routing\Controller
             ], 500);
         }
     }
+
     public function store(Request $request)
     {
         try {
             $user = $request->user();
-
+            
             $data = $request->validate([
                 'account_id'      => 'required|exists:accounts,id',
                 'category_id'     => 'required|exists:categories,id',
                 'amount'          => 'required|numeric',
-                'transaction_date' => 'required|date',
+                'transaction_date'=> 'required|date',
             ]);
+
             // Proverava da li korisnik pokušava da kreira transakciju za tuđi račun
             $account = Account::findOrFail($data['account_id']);
             if ($user->role !== 'admin' && $account->user_id !== $user->id) {
@@ -86,16 +94,18 @@ class TransactionController extends \Illuminate\Routing\Controller
             }
 
             $transaction = Transaction::create($data);
-
+            
             // Load relationships for response
             $transaction->load(['account', 'category']);
-
+            
             return response()->json($transaction, 201);
+
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors'  => $e->errors(),
             ], 422);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to create transaction',
@@ -103,18 +113,19 @@ class TransactionController extends \Illuminate\Routing\Controller
             ], 500);
         }
     }
+
     public function show(Request $request, Transaction $transaction)
     {
         try {
             $user = $request->user();
-
+            
             // Proverava da li korisnik ima dozvolu da vidi ovu transakciju
             if ($user && $user->role !== 'admin' && $transaction->account->user_id !== $user->id) {
                 return response()->json([
                     'message' => 'Unauthorized to view this transaction'
                 ], 403);
             }
-
+            
             $transaction->load(['account', 'category']);
             return response()->json($transaction);
         } catch (\Throwable $e) {
@@ -129,28 +140,30 @@ class TransactionController extends \Illuminate\Routing\Controller
     {
         try {
             $user = $request->user();
-
+            
             // Proverava da li korisnik ima dozvolu da ažurira ovu transakciju
             if ($user->role !== 'admin' && $transaction->account->user_id !== $user->id) {
                 return response()->json([
                     'message' => 'Unauthorized to update this transaction'
                 ], 403);
             }
-
+            
             $data = $request->validate([
                 'amount'          => 'sometimes|required|numeric',
-                'transaction_date' => 'sometimes|required|date',
+                'transaction_date'=> 'sometimes|required|date',
                 'category_id'     => 'sometimes|required|exists:categories,id',
             ]);
 
             $transaction->update($data);
             $transaction->load(['account', 'category']);
             return response()->json($transaction);
+
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors'  => $e->errors(),
             ], 422);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to update transaction',
@@ -163,16 +176,17 @@ class TransactionController extends \Illuminate\Routing\Controller
     {
         try {
             $user = $request->user();
-
+            
             // Proverava da li korisnik ima dozvolu da obriše ovu transakciju
             if ($user->role !== 'admin' && $transaction->account->user_id !== $user->id) {
                 return response()->json([
                     'message' => 'Unauthorized to delete this transaction'
                 ], 403);
             }
-
+            
             $transaction->delete();
             return response()->json(null, 204);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to delete transaction',
@@ -180,18 +194,21 @@ class TransactionController extends \Illuminate\Routing\Controller
             ], 500);
         }
     }
+    
     public function search(Request $request)
     {
         try {
             $user = $request->user();
             $q = $request->input('q');
+
             if (! is_numeric($q)) {
                 return response()->json([
                     'message' => 'Query must be a number (amount).'
                 ], 422);
             }
-            $query = Transaction::where('amount', '>=', $q)->with(['account', 'category']);
 
+            $query = Transaction::where('amount', '>=', $q)->with(['account', 'category']);
+            
             // Ako nije admin, traži samo svoje transakcije
             if ($user && $user->role !== 'admin') {
                 $query->whereHas('account', function ($q) use ($user) {

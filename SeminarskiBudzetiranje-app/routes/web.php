@@ -31,7 +31,7 @@ Route::prefix('api')->group(function () {
 
     // Protected routes that require authentication
     Route::middleware(['auth:sanctum'])->group(function () {
-
+        
         // Resource routes - accessible to authenticated users
         Route::apiResource('accounts', AccountController::class);
         Route::apiResource('categories', CategoryController::class);
@@ -57,19 +57,19 @@ Route::prefix('api')->group(function () {
         Route::prefix('analytics')->name('analytics.')->group(function () {
             Route::get('financial-overview', [AnalyticsController::class, 'getFinancialOverview'])
                 ->name('financial-overview');
-
+            
             Route::get('monthly-trends', [AnalyticsController::class, 'getMonthlyTrends'])
                 ->name('monthly-trends');
-
+            
             Route::get('user-summary-procedure', [AnalyticsController::class, 'getUserSummaryProcedure'])
                 ->name('user-summary-procedure');
-
+            
             Route::post('batch-transaction-update', [AnalyticsController::class, 'batchTransactionUpdate'])
                 ->name('batch-transaction-update');
-
+            
             Route::get('category-analysis', [AnalyticsController::class, 'getCategoryAnalysis'])
                 ->name('category-analysis');
-
+            
             Route::get('audit-log', [AnalyticsController::class, 'getAuditLog'])
                 ->name('audit-log');
         });
@@ -80,7 +80,7 @@ Route::prefix('api')->group(function () {
         Route::get('admin/dashboard', function () {
             return response()->json(['message' => 'Welcome Admin']);
         });
-
+        
         // User management routes
         Route::apiResource('users', UserController::class);
         Route::get('admin/system-stats', [UserController::class, 'systemStats'])
@@ -96,4 +96,4 @@ Route::prefix('api')->group(function () {
 // SPA fallback route for React - must be at the very end
 Route::get('/{any}', function () {
     return view('welcome');
-});
+})->where('any', '.*');

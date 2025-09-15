@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -20,4 +19,3 @@ class Account extends Model
         return $this->hasMany(Transaction::class);
     }
 }
-

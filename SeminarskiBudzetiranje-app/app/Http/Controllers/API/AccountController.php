@@ -14,7 +14,7 @@ class AccountController extends \Illuminate\Routing\Controller
         // STORE / UPDATE / DESTROY zahtevaju autentifikaciju
         $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
     }
-
+    
     public function index(Request $request)
     {
         try {
@@ -51,7 +51,7 @@ class AccountController extends \Illuminate\Routing\Controller
     {
         try {
             $user = $request->user();
-
+            
             $data = $request->validate([
                 'user_id' => 'nullable|exists:users,id', // Admin može da specificira user_id
                 'name'    => 'required|string|max:255',
@@ -87,14 +87,14 @@ class AccountController extends \Illuminate\Routing\Controller
     {
         try {
             $user = $request->user();
-
+            
             // Proverava da li korisnik ima dozvolu da vidi ovaj račun
             if ($user && $user->role !== 'admin' && $account->user_id !== $user->id) {
-return response()->json([
+    return response()->json([
         'message' => 'Unauthorized to view this account'
     ], 403);
 }
-
+            
             return response()->json($account);
         } catch (\Throwable $e) {
             return response()->json([
@@ -108,14 +108,14 @@ return response()->json([
     {
         try {
             $user = $request->user();
-
+            
             // Proverava da li korisnik ima dozvolu da ažurira ovaj račun
             if ($user->role !== 'admin' && $account->user_id !== $user->id) {
                 return response()->json([
                     'message' => 'Unauthorized to update this account'
                 ], 403);
             }
-
+            
             $data = $request->validate([
                 'name'    => 'sometimes|required|string|max:255',
                 'balance' => 'sometimes|numeric',
@@ -142,14 +142,14 @@ return response()->json([
     {
         try {
             $user = $request->user();
-
+            
             // Proverava da li korisnik ima dozvolu da obriše ovaj račun
             if ($user->role !== 'admin' && $account->user_id !== $user->id) {
                 return response()->json([
                     'message' => 'Unauthorized to delete this account'
                 ], 403);
             }
-
+            
             $account->delete();
             return response()->json(null, 204);
 
@@ -160,7 +160,7 @@ return response()->json([
             ], 500);
         }
     }
-
+    
     /**
      * Dinamička ruta: sve transakcije za dati račun
      */
@@ -168,14 +168,14 @@ return response()->json([
     {
         try {
             $user = $request->user();
-
+            
             // Proverava da li korisnik ima dozvolu da vidi transakcije ovog računa
             if ($user && $user->role !== 'admin' && $account->user_id !== $user->id) {
                 return response()->json([
                     'message' => 'Unauthorized to view transactions for this account'
                 ], 403);
             }
-
+            
             $transactions = $account->transactions; // relacija iz modela
             return response()->json($transactions);
         } catch (\Throwable $e) {
@@ -184,4 +184,5 @@ return response()->json([
                 'error'   => $e->getMessage(),
             ], 500);
         }
-    }}
+    }
+}

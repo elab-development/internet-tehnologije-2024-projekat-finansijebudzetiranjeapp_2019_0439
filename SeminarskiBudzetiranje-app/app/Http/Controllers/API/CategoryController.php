@@ -16,28 +16,29 @@ class CategoryController extends \Illuminate\Routing\Controller
         $this->middleware('auth:sanctum')->only(['store', 'update', 'destroy']);
     }
     public function index(Request $request)
-    {
-        try {
-            $perPage = $request->query('per_page', 15);
-            $page    = $request->query('page', 1);
+{
+    try {
+        $perPage = $request->query('per_page', 15);
+        $page    = $request->query('page', 1);
 
-            $query = Category::query();
+        $query = Category::query();
 
-            // Filter by type (income|expense)
-            if ($request->has('type')) {
-                $query->where('type', $request->query('type'));
-            }
-
-            $categories = $query->paginate($perPage, ['*'], 'page', $page);
-
-            return response()->json($categories);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'message' => 'Failed to fetch categories',
-                'error'   => $e->getMessage(),
-            ], 500);
+        // Filter by type (income|expense)
+        if ($request->has('type')) {
+            $query->where('type', $request->query('type'));
         }
+
+        $categories = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json($categories);
+
+    } catch (\Throwable $e) {
+        return response()->json([
+            'message' => 'Failed to fetch categories',
+            'error'   => $e->getMessage(),
+        ], 500);
     }
+}
 
     public function store(Request $request)
     {
@@ -50,11 +51,13 @@ class CategoryController extends \Illuminate\Routing\Controller
 
             $category = Category::create($data);
             return response()->json($category, 201);
+
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors'  => $e->errors(),
             ], 422);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to create category',
@@ -85,11 +88,13 @@ class CategoryController extends \Illuminate\Routing\Controller
 
             $category->update($data);
             return response()->json($category);
+
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors'  => $e->errors(),
             ], 422);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to update category',
@@ -103,6 +108,7 @@ class CategoryController extends \Illuminate\Routing\Controller
         try {
             $category->delete();
             return response()->json(null, 204);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Failed to delete category',
