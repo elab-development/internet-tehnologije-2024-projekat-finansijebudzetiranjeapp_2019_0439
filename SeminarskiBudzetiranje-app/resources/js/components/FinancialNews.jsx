@@ -51,7 +51,7 @@ const FinancialNews = ({ compact = false }) => {
                     id: 1,
                     title: "Federal Reserve Announces New Interest Rate Decision",
                     description: "The Federal Reserve has decided to maintain current interest rates, signaling a cautious approach to monetary policy amid economic uncertainty.",
-                    url: "#",
+                    url: "https://example.com/fed-rates",
                     urlToImage: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=200&fit=crop",
                     publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
                     source: { name: "Financial Times" },
@@ -62,7 +62,7 @@ const FinancialNews = ({ compact = false }) => {
                     id: 2,
                     title: "Consumer Price Index Shows Inflation Trends",
                     description: "Latest CPI data reveals important trends in consumer prices, affecting household budgeting and spending patterns across various sectors.",
-                    url: "#",
+                    url: "https://example.com/cpi-data",
                     urlToImage: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=200&fit=crop",
                     publishedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
                     source: { name: "Reuters" },
@@ -73,7 +73,7 @@ const FinancialNews = ({ compact = false }) => {
                     id: 3,
                     title: "Digital Banking Trends Transform Personal Finance",
                     description: "New fintech solutions are making personal budgeting and financial management more accessible to consumers worldwide.",
-                    url: "#",
+                    url: "https://example.com/digital-banking",
                     urlToImage: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=200&fit=crop",
                     publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
                     source: { name: "TechCrunch" },
@@ -84,7 +84,7 @@ const FinancialNews = ({ compact = false }) => {
                     id: 4,
                     title: "Housing Market Update: Impact on Personal Budgets",
                     description: "Recent changes in housing costs are significantly affecting how families plan their monthly budgets and long-term financial goals.",
-                    url: "#",
+                    url: "https://example.com/housing-market",
                     urlToImage: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=200&fit=crop",
                     publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
                     source: { name: "Wall Street Journal" },
@@ -95,7 +95,7 @@ const FinancialNews = ({ compact = false }) => {
                     id: 5,
                     title: "Investment Apps Make Portfolio Management Easier",
                     description: "New mobile applications are simplifying investment tracking and portfolio management for retail investors and budget-conscious savers.",
-                    url: "#",
+                    url: "https://example.com/investment-apps",
                     urlToImage: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=200&fit=crop",
                     publishedAt: new Date(Date.now() - 16 * 60 * 60 * 1000).toISOString(),
                     source: { name: "Bloomberg" },
@@ -106,7 +106,7 @@ const FinancialNews = ({ compact = false }) => {
                     id: 6,
                     title: "Energy Prices Affect Household Expenses",
                     description: "Fluctuating energy costs continue to impact family budgets, with experts providing tips for managing utility expenses effectively.",
-                    url: "#",
+                    url: "https://example.com/energy-prices",
                     urlToImage: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400&h=200&fit=crop",
                     publishedAt: new Date(Date.now() - 20 * 60 * 60 * 1000).toISOString(),
                     source: { name: "CNBC" },
@@ -154,6 +154,16 @@ const FinancialNews = ({ compact = false }) => {
         return icons[category] || icons.default;
     };
 
+    // Funkcija za otvaranje članka
+    const openArticle = (url) => {
+        if (url && url !== '#') {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            // Ako nema valjan URL, prikaži poruku
+            alert('Article link is not available');
+        }
+    };
+
     // Kompaktna verzija za sidebar
     if (compact) {
         return (
@@ -175,11 +185,22 @@ const FinancialNews = ({ compact = false }) => {
                 ) : (
                     <div>
                         {news.slice(0, 3).map(article => (
-                            <div key={article.id} style={{
-                                padding: '8px 0',
-                                borderBottom: '1px solid #f0f0f0',
-                                fontSize: '13px'
-                            }}>
+                            <div 
+                                key={article.id} 
+                                style={{
+                                    padding: '8px 0',
+                                    borderBottom: '1px solid #f0f0f0',
+                                    fontSize: '13px',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={() => openArticle(article.url)}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                }}
+                            >
                                 <div style={{
                                     display: 'flex',
                                     justifyContent: 'space-between',
@@ -312,22 +333,26 @@ const FinancialNews = ({ compact = false }) => {
                     {news.map(article => {
                         const relevanceBadge = getRelevanceBadge(article.relevance);
                         return (
-                            <div key={article.id} style={{
-                                border: '1px solid #e9ecef',
-                                borderRadius: '8px',
-                                overflow: 'hidden',
-                                backgroundColor: '#fff',
-                                transition: 'transform 0.2s, box-shadow 0.2s',
-                                cursor: 'pointer'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = 'none';
-                            }}>
+                            <div 
+                                key={article.id} 
+                                style={{
+                                    border: '1px solid #e9ecef',
+                                    borderRadius: '8px',
+                                    overflow: 'hidden',
+                                    backgroundColor: '#fff',
+                                    transition: 'transform 0.2s, box-shadow 0.2s',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={() => openArticle(article.url)}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                }}
+                            >
                                 {/* Article Image */}
                                 <div style={{ position: 'relative' }}>
                                     <img
@@ -370,6 +395,21 @@ const FinancialNews = ({ compact = false }) => {
                                         fontSize: '16px'
                                     }}>
                                         {getCategoryIcon(article.category)}
+                                    </div>
+
+                                    {/* Click indicator */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '10px',
+                                        right: '10px',
+                                        backgroundColor: 'rgba(0,123,255,0.8)',
+                                        color: 'white',
+                                        padding: '4px 8px',
+                                        borderRadius: '12px',
+                                        fontSize: '11px',
+                                        fontWeight: 'bold'
+                                    }}>
+                                        🔗 Click to read
                                     </div>
                                 </div>
 
